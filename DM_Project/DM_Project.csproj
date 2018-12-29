@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
-    <PackageReference Include="TMDbLib" Version="1.0.0" />
+    <PackageReference Include="TMDbLib.Core2" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

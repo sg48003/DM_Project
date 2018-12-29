@@ -24,16 +24,14 @@ namespace DM_Project.Controllers
         private readonly MovieService _movieService;
         private readonly UserService _userService;
         private readonly AppSettings _appSettings;
-
-        //TODO: api key u config
-        // ReSharper disable once InconsistentNaming
-        private readonly Imdb imdb = new Imdb("e15da83d");
+        private readonly Imdb _imdb;
 
         public UsersController(MovieService movieService, UserService userService, IOptions<AppSettings> appSettings)
         {
             _movieService = movieService;
             _userService = userService;
             _appSettings = appSettings.Value;
+            _imdb = new Imdb(appSettings.Value.ImdbApiKey);
         }
 
         [AllowAnonymous]
@@ -100,7 +98,7 @@ namespace DM_Project.Controllers
         [HttpPost]
         public ActionResult AddMovieToCollection(string imbdId, string userId, string comment, decimal rating)
         {
-            ImdbMovie movie = imdb.GetMovieFromIdAsync(imbdId).Result;
+            ImdbMovie movie = _imdb.GetMovieFromIdAsync(imbdId).Result;
             if (_movieService.Exists(movie.ImdbId) == false)
             {
                 _movieService.Create(movie);
