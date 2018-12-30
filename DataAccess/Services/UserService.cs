@@ -30,6 +30,11 @@ namespace DataAccess.Services
             return _users.Find(x => x.Id == id).SingleOrDefault();
         }
 
+        public User GetByEmail(string email)
+        {
+            return _users.Find(x => x.Email == email).SingleOrDefault();
+        }
+
         public User Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -69,6 +74,12 @@ namespace DataAccess.Services
             userIn.PasswordHash = passwordHash;
             userIn.PasswordSalt = passwordSalt;
 
+            _users.InsertOne(userIn);
+            return userIn;
+        }
+
+        public User RegisterFacebook(User userIn)
+        {
             _users.InsertOne(userIn);
             return userIn;
         }

@@ -13,14 +13,12 @@ namespace DM_Project.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {   
-        private readonly IOptions<AppSettings> _appSettings;
         private readonly TMDbClient _client;
         private readonly Imdb _imdb;
 
         public MoviesController(IOptions<AppSettings> appSettings)
         {
-            _appSettings = appSettings;
-            _client = new TMDbClient(appSettings.Value.TMDbApiKey);
+            _client = new TMDbClient(appSettings.Value.TmdbApiKey);
             _imdb = new Imdb(appSettings.Value.ImdbApiKey);
         }
 

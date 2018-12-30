@@ -4,6 +4,6 @@
     {
         public string Secret { get; set; }
         public string ImdbApiKey { get; set; }
-        public string TMDbApiKey { get; set; }
+        public string TmdbApiKey { get; set; }
     }
 }

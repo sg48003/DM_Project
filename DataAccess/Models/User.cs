@@ -14,6 +14,7 @@ namespace DataAccess.Models
         public byte[] PasswordSalt { get; set; }
         public string Email { get; set; }
         public DateTime DateOfBirth { get; set; }
+        public long? FacebookId { get; set; }
         public string Image { get; set; } //možda byte[] ???
     }
 }

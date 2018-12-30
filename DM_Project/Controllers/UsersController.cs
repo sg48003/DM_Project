@@ -17,7 +17,6 @@ using MongoDB.Bson;
 namespace DM_Project.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
     public class UsersController : Controller
     {
@@ -35,8 +34,9 @@ namespace DM_Project.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("register")]
-        public IActionResult Register([FromBody]RegisterUser userIn)
+        [Route("api/users/register")]
+        [HttpPost]
+        public IActionResult Register([FromBody] RegisterUser userIn)
         {
             if (ModelState.IsValid == false)
             {
@@ -59,8 +59,9 @@ namespace DM_Project.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("authenticate")]
-        public IActionResult Authenticate([FromBody]LoginUser userIn)
+        [Route("api/users/authenticate")]
+        [HttpPost]
+        public IActionResult Authenticate([FromBody] LoginUser userIn)
         {
             var user = _userService.Authenticate(userIn.Username, userIn.Password);
 
@@ -115,5 +116,6 @@ namespace DM_Project.Controllers
         {
             return _userService.GetMovieCollection(ObjectId.Parse(userId));
         }
+
     }
 }
