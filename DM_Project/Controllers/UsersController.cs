@@ -36,7 +36,7 @@ namespace DM_Project.Controllers
         [AllowAnonymous]
         [Route("api/users/register")]
         [HttpPost]
-        public IActionResult Register([FromBody] RegisterUser userIn)
+        public IActionResult Register([FromBody] RegisterUserModel userIn)
         {
             if (ModelState.IsValid == false)
             {
@@ -61,7 +61,7 @@ namespace DM_Project.Controllers
         [AllowAnonymous]
         [Route("api/users/authenticate")]
         [HttpPost]
-        public IActionResult Authenticate([FromBody] LoginUser userIn)
+        public IActionResult Authenticate([FromBody] LoginUserModel userIn)
         {
             var user = _userService.Authenticate(userIn.Username, userIn.Password);
 
@@ -115,6 +115,21 @@ namespace DM_Project.Controllers
         public ActionResult<IEnumerable<Movie>> GetMovieCollection(string userId)
         {
             return _userService.GetMovieCollection(ObjectId.Parse(userId));
+        }
+
+        [Route("api/users/friends/movies/collection")]
+        [HttpGet]
+        public ActionResult<IEnumerable<Movie>> GetFriendsMovieCollection(string userId)
+        {
+            var movieRecommendations = new List<Movie>();
+
+            var user = _userService.GetById(ObjectId.Parse(userId));
+            foreach (var friend in user.FacebookFriends)
+            {
+                movieRecommendations.AddRange(_userService.GetFacebookFriendsMovieCollection(friend.FacebookId));
+            }
+
+            return movieRecommendations;
         }
 
     }

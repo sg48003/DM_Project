@@ -2,7 +2,7 @@
 
 namespace DM_Project.Models
 {
-    public class SearchMovie
+    public class SearchMovieModel
     {
         public int Id { get; set; }
         public string Title { get; set; }

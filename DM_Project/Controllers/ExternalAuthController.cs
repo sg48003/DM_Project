@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
@@ -18,12 +19,6 @@ namespace DM_Project.Controllers
     public class ExternalAuthController : Controller
     {
         private readonly UserService _userService;
-        //private readonly JwtFactory _jwtFactory;
-        /*private readonly JwtIssuerOptions _jwtOptions;*/
-
-        //private readonly string facebookAppId = "414842875920886";
-        //private readonly string facebookAppSecret = "471f887def17495b0b330489c5d02838";
-
         private readonly AppSettings _appSettings;
         private readonly HttpClient _client = new HttpClient();
 
@@ -31,22 +26,21 @@ namespace DM_Project.Controllers
         {
             _appSettings = appSettings.Value;
             _userService = userService;
-            //_jwtFactory = jwtFactory;
-            //_jwtOptions = jwtOptions.Value;
         }
 
         [Route("api/externalauth/facebooklogin/")]
         [HttpPost]
         public async Task<IActionResult> FacebookLogin(string accessToken)
         {
-        //dodati povratnu vezu URL na stranicu https://developers.facebook.com/
-            //treba ranije pozvati https://www.facebook.com/v2.11/dialog/oauth?&response_type=token&display=popup&client_id=414842875920886&display=popup&redirect_uri={URL_ZA_POVRATNU_VEZU}&scope=email,user_birthday,user_friends
+            //korisnik mora biti tester da bi radilo, to se može postaviti na https://developers.facebook.com/ 
+            //dodati povratnu vezu URL na stranicu https://developers.facebook.com/
+            //treba ranije pozvati https://www.facebook.com/v2.11/dialog/oauth?&response_type=token&display=popup&client_id={_appSettings.FacebookAppId}&display=popup&redirect_uri={URL_ZA_POVRATNU_VEZU}&scope=email,user_birthday,user_friends
             //proslijediti ovoj metodi access token koji se dobije pozivanjem gornjeg url-a
 
             // 1.generate an app access token
             var appAccessTokenResponse =
                 await _client.GetStringAsync(
-                    $"https://graph.facebook.com/oauth/access_token?client_id=414842875920886&client_secret=471f887def17495b0b330489c5d02838&grant_type=client_credentials");
+                    $"https://graph.facebook.com/oauth/access_token?client_id={_appSettings.FacebookAppId}&client_secret={_appSettings.FacebookAppSecret}&grant_type=client_credentials");
             var appAccessToken = JsonConvert.DeserializeObject<FacebookAppAccessToken>(appAccessTokenResponse);
 
             // 2. validate the user access token
@@ -59,10 +53,20 @@ namespace DM_Project.Controllers
                 return BadRequest("Invalid facebook token.");
             }
 
-            //TODO: vratiti više podataka 
             // 3. we've got a valid token so we can request user data from fb
-            var userInfoResponse = await _client.GetStringAsync($"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={accessToken}");
+            var userInfoResponse = await _client.GetStringAsync($"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,birthday,picture,friends&access_token={accessToken}");
             var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
+
+            var facebookFriends = new List<FacebookFriend>();
+            foreach (var item in userInfo.Friends.Data)
+            {
+                var friend = new FacebookFriend()
+                {
+                    FacebookId = item.Id,
+                    Name = item.Name
+                };
+                facebookFriends.Add(friend);
+            }
 
             // 4. ready to create the local user account (if necessary) and jwt
             var user = _userService.GetByEmail(userInfo.Email);
@@ -77,11 +81,37 @@ namespace DM_Project.Controllers
                     Email = userInfo.Email,
                     DateOfBirth = DateTime.Parse(userInfo.DateOfBirth),
                     Image = userInfo.Picture.Data.Url,
-                    FacebookId = userInfo.Id
-
+                    FacebookId = userInfo.Id,
+                    FacebookFriends = facebookFriends
                 };
+               
                 _userService.RegisterFacebook(userIn);
                 user = userIn;
+            }
+            else
+            {
+                var updateFlag = false;
+
+                if (user.FacebookId == null)
+                {
+                    user.FacebookId = userInfo.Id;
+                    updateFlag = true;
+                }
+
+                foreach (var item in facebookFriends)
+                {
+                    if (user.FacebookFriends.Contains(item) == false)
+                    {
+                        user.FacebookFriends = facebookFriends;
+                        updateFlag = true;
+                        break;
+                    }
+                }
+
+                if (updateFlag)
+                {
+                    _userService.UpdateFacebookUser(user.Id, user);
+                }                
             }
 
             //var jwt = await Tokens.GenerateJwt(_jwtFactory.GenerateClaimsIdentity(localUser.Username, localUser.Id.ToString()),
@@ -110,9 +140,6 @@ namespace DM_Project.Controllers
                 LastName = user.LastName,
                 Token = tokenString
             });
-
-            //return Ok("test");
         }
-
     }
 }

@@ -24,13 +24,13 @@ namespace DM_Project.Controllers
 
         [Route("api/movie/search")]
         [HttpGet]
-        public ActionResult<IEnumerable<Models.SearchMovie>> Search(string name, int? year = null, int? genre = null)
+        public ActionResult<IEnumerable<Models.SearchMovieModel>> Search(string name, int? year = null, int? genre = null)
         {
             SearchContainer<SearchMovie> searchMovies = _client.SearchMovieAsync(name, 1, false, year ?? 0).Result;
             var genres = _client.GetMovieGenresAsync().Result;
             IEnumerable<SearchMovie> filteredMovies = genre != null ? searchMovies.Results.Where(x => x.GenreIds.Contains((int)genre)).ToList() : searchMovies.Results.ToList();
 
-            return filteredMovies.Select(movie => new Models.SearchMovie
+            return filteredMovies.Select(movie => new Models.SearchMovieModel
             {
                 Title = movie.Title,
                 ReleaseDate = movie.ReleaseDate,
@@ -44,14 +44,21 @@ namespace DM_Project.Controllers
                 .ToList();
         }
 
+        [Route("api/movie/genres")]
+        [HttpGet]
+        public ActionResult<IEnumerable<Genre>> GetGenres()
+        {
+            return _client.GetMovieGenresAsync().Result;
+        }
+
         [Route("api/movies/popular")]
         [HttpGet]
-        public ActionResult<IEnumerable<Models.SearchMovie>> Popular()
+        public ActionResult<IEnumerable<Models.SearchMovieModel>> Popular()
         {
             IEnumerable<SearchMovie> popularMovies = _client.GetMoviePopularListAsync().Result.Results;
             var genres = _client.GetMovieGenresAsync().Result;
 
-            return popularMovies.Select(movie => new Models.SearchMovie
+            return popularMovies.Select(movie => new Models.SearchMovieModel
             {
                 Title = movie.Title,
                 ReleaseDate = movie.ReleaseDate,
@@ -77,11 +84,11 @@ namespace DM_Project.Controllers
 
         [Route("api/movies/recommendations")]
         [HttpGet]
-        public ActionResult<IEnumerable<Models.SearchMovie>> Recommendations(int id)
+        public ActionResult<IEnumerable<Models.SearchMovieModel>> Recommendations(int id)
         {
             List<SearchMovie> recommendedMovies = _client.GetMovieRecommendationsAsync(id).Result.Results;
             var genres = _client.GetMovieGenresAsync().Result;
-            return recommendedMovies.Select(movie => new Models.SearchMovie
+            return recommendedMovies.Select(movie => new Models.SearchMovieModel
                 {
                     Title = movie.Title,
                     ReleaseDate = movie.ReleaseDate,

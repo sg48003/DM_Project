@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using DataAccess.Helpers;
 using DataAccess.Models;
 using IMDBCore;
@@ -80,6 +79,10 @@ namespace DataAccess.Services
 
         public User RegisterFacebook(User userIn)
         {
+            if (_users.Find(user => user.Username == userIn.Username).Any())
+            {
+                throw new Exception("Username \"" + userIn.Username + "\" is already taken");
+            }
             _users.InsertOne(userIn);
             return userIn;
         }
@@ -120,14 +123,9 @@ namespace DataAccess.Services
             _users.ReplaceOne(x => x.Id == user.Id, user);
         }
 
-        public void Update(ObjectId id, User userIn)
+        public void UpdateFacebookUser(ObjectId id, User userIn)
         {
             _users.ReplaceOne(user => user.Id == id, userIn);
-        }
-
-        public void Remove(User userIn)
-        {
-            _users.DeleteOne(user => user.Id == userIn.Id);
         }
 
         public void Remove(ObjectId id)
@@ -159,6 +157,18 @@ namespace DataAccess.Services
             return _movies.Find(filter).ToList();
         }
 
+        public List<Movie> GetFacebookFriendsMovieCollection(long facebookId)
+        {
+            var user =_users.Find(x => x.FacebookId == facebookId).SingleOrDefault();
+
+            List<MovieCollection> movieCollection = _movieCollections.Find(collection => collection.UserId == user.Id).ToList();
+            List<string> movieIds = movieCollection.Select(x => x.MovieId).ToList();
+
+            var filterDef = new FilterDefinitionBuilder<Movie>();
+            var filter = filterDef.In(x => x.ImdbId, movieIds);
+
+            return _movies.Find(filter).ToList();
+        }
 
     }
 }

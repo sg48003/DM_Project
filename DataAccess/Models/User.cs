@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 
 namespace DataAccess.Models
@@ -16,5 +17,6 @@ namespace DataAccess.Models
         public DateTime DateOfBirth { get; set; }
         public long? FacebookId { get; set; }
         public string Image { get; set; } //možda byte[] ???
+        public List<FacebookFriend> FacebookFriends { get; set; } = new List<FacebookFriend>();
     }
 }

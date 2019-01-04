@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DataAccess.Models;
+﻿using DataAccess.Models;
 using IMDBCore;
 using MongoDB.Driver;
 
@@ -14,16 +13,6 @@ namespace DataAccess.Services
             var client = new MongoClient();
             var database = client.GetDatabase("DM_ProjectDB");
             _movies = database.GetCollection<Movie>("Movies");
-        }
-
-        public List<Movie> Get()
-        {
-            return _movies.Find(movie => true).ToList();
-        }
-
-        public Movie Get(string id)
-        {
-            return _movies.Find(movie => movie.ImdbId == id).FirstOrDefault();
         }
 
         public Movie Create(ImdbMovie movieIn)
@@ -49,21 +38,6 @@ namespace DataAccess.Services
             };
             _movies.InsertOne(movie);
             return movie;
-        }
-
-        public void Update(string id, Movie movieIn)
-        {
-            _movies.ReplaceOne(movie => movie.ImdbId == id, movieIn);
-        }
-
-        public void Remove(Movie movieIn)
-        {
-            _movies.DeleteOne(movie => movie.ImdbId == movieIn.ImdbId);
-        }
-
-        public void Remove(string id)
-        {
-            _movies.DeleteOne(movie => movie.ImdbId == id);
         }
 
         public bool Exists(string id)

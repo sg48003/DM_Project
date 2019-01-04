@@ -2,7 +2,7 @@
 
 namespace DM_Project.Models
 {
-    public class RegisterUser
+    public class RegisterUserModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
