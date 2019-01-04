@@ -112,16 +112,32 @@ namespace DM_Project.Controllers
 
         [Route("api/users/movies/collection")]
         [HttpGet]
-        public ActionResult<IEnumerable<Movie>> GetMovieCollection(string userId)
+        public ActionResult<IEnumerable<MovieCollectionInfo>> GetMovieCollection(string userId)
         {
             return _userService.GetMovieCollection(ObjectId.Parse(userId));
         }
 
+        [Route("api/users/movies/collection")]
+        [HttpPost]
+        public ActionResult UpdateMovieCollection(List<MovieCollectionInfo> movies)
+        {
+            _userService.UpdateMovieCollection(movies);
+            return Ok();
+        }
+
+        [Route("api/users/movies/collection")]
+        [HttpDelete]
+        public ActionResult UpdateMovieCollection(string movieCollectionId)
+        {
+            _userService.DeleteMovieFromCollection(movieCollectionId);
+            return Ok();
+        }
+
         [Route("api/users/friends/movies/collection")]
         [HttpGet]
-        public ActionResult<IEnumerable<Movie>> GetFriendsMovieCollection(string userId)
+        public ActionResult<IEnumerable<MovieCollectionInfo>> GetFriendsMovieCollection(string userId)
         {
-            var movieRecommendations = new List<Movie>();
+            var movieRecommendations = new List<MovieCollectionInfo>();
 
             var user = _userService.GetById(ObjectId.Parse(userId));
             foreach (var friend in user.FacebookFriends)

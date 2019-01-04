@@ -146,28 +146,63 @@ namespace DataAccess.Services
             return movieCollection;
         }
 
-        public List<Movie> GetMovieCollection(ObjectId userId)
+        public List<MovieCollectionInfo> GetMovieCollection(ObjectId userId)
         {
+            var movieCollectionInfo = new List<MovieCollectionInfo>();
+
             List<MovieCollection> movieCollection = _movieCollections.Find(collection => collection.UserId == userId).ToList();
-            List<string> movieIds = movieCollection.Select(x => x.MovieId).ToList();
+            foreach (var item in movieCollection)
+            {
+                var movie = _movies.Find(x => x.Id == ObjectId.Parse(item.MovieId)).SingleOrDefault();
+                if (movie != null)
+                {
+                    var newMovieInfo = new MovieCollectionInfo()
+                    {
+                        Movie = movie,
+                        MovieCollection = item
+                    };
+                    movieCollectionInfo.Add(newMovieInfo);
+                }
+            }
 
-            var filterDef = new FilterDefinitionBuilder<Movie>();
-            var filter = filterDef.In(x => x.ImdbId, movieIds);
-
-            return _movies.Find(filter).ToList();
+            return movieCollectionInfo;
         }
 
-        public List<Movie> GetFacebookFriendsMovieCollection(long facebookId)
+        public void UpdateMovieCollection(List<MovieCollectionInfo> movieCollectionInfoIn)
         {
+            foreach (var item in movieCollectionInfoIn)
+            {
+                _movieCollections.ReplaceOne(movie => movie.Id == item.MovieCollection.Id, item.MovieCollection);
+            }
+        }
+
+        public void DeleteMovieFromCollection(string movieCollectionId)
+        {
+            _movieCollections.DeleteOne(x => x.Id == ObjectId.Parse(movieCollectionId));
+        }
+        
+
+        public List<MovieCollectionInfo> GetFacebookFriendsMovieCollection(long facebookId)
+        {
+            var movieCollectionInfo = new List<MovieCollectionInfo>();
             var user =_users.Find(x => x.FacebookId == facebookId).SingleOrDefault();
 
             List<MovieCollection> movieCollection = _movieCollections.Find(collection => collection.UserId == user.Id).ToList();
-            List<string> movieIds = movieCollection.Select(x => x.MovieId).ToList();
+            foreach (var item in movieCollection)
+            {
+                var movie = _movies.Find(x => x.Id == ObjectId.Parse(item.MovieId)).SingleOrDefault();
+                if (movie != null)
+                {
+                    var newMovieInfo = new MovieCollectionInfo()
+                    {
+                        Movie = movie,
+                        MovieCollection = item
+                    };
+                    movieCollectionInfo.Add(newMovieInfo);
+                }
+            }
 
-            var filterDef = new FilterDefinitionBuilder<Movie>();
-            var filter = filterDef.In(x => x.ImdbId, movieIds);
-
-            return _movies.Find(filter).ToList();
+            return movieCollectionInfo;
         }
 
     }
