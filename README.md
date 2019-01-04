@@ -13,7 +13,7 @@ Dosad napravljeno :
     - Dodavanje filma u kolekciju korisniku uz njegovu ocjenu i komentar
     - Brisanje pojednog filma iz kolekcije proslijeđujući MovieCollectionId
     - Osvježavanje kolekcije pojedinog korisnika
-    - Dohvaćanje kolekcije pojedinog korisnika ili dohvaćanje kolekcije facebook prijatelja pojedinog korisnika s podacima o filmova
+    - Dohvaćanje kolekcije pojedinog korisnika ili dohvaćanje kolekcije facebook prijatelja pojedinog korisnika s podacima o filmovima
     
 - Web API (.NET Core 2.2) :
     - Modeli : FacebookApiResponses, LoginUserModel, RegisterUserModel, SearchMovieModel, AppSettings
@@ -38,4 +38,4 @@ Dosad napravljeno :
             - Dohvaćanje kolekcije korisnika
             - Dohvaćanje kolekcije facebook prijatelja od korisnika (preporuka?)
         - ExternalAuthController :
-            - Facebook Login uz koji ako korisnik ne postoji ga se stvara, ili ako postoji ga se po potrebi osvježava
+            - Facebook login uz koji ako korisnik ne postoji ga se stvara, ili ako postoji ga se po potrebi osvježava
