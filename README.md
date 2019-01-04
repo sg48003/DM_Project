@@ -1,7 +1,7 @@
 # DM_Project
 Dosad napravljeno :
 - MongoDB baza podataka :
-    - Modeli : Movie, MovieCollection, User, FacebookFriend
+    - Modeli : Movie, MovieCollection, User, FacebookFriend, MovieCollectionInfo
     - Kriptografija lozinke korisnika
     - Spremanje filma u bazu podataka 
     - Provjeravanja da li postoji film s proslijeđenim ImdbId-jem
@@ -11,10 +11,12 @@ Dosad napravljeno :
     - Osvježavanje "običnog" i facebook korisnika
     - Brisanje korisnika preko parametra id
     - Dodavanje filma u kolekciju korisniku uz njegovu ocjenu i komentar
-    - Dohvaćanje kolekcije pojedinog korisnika ili dohvaćanje kolekcije facebook prijatelja pojedinog korisnika
+    - Brisanje pojednog filma iz kolekcije proslijeđujući MovieCollectionId
+    - Osvježavanje kolekcije pojedinog korisnika
+    - Dohvaćanje kolekcije pojedinog korisnika ili dohvaćanje kolekcije facebook prijatelja pojedinog korisnika s podacima o filmovima
     
 - Web API (.NET Core 2.2) :
-    - Modeli : FAcebookApiResponses, LoginUserModel, RegisterUserModel, SearchMovieModel, AppSettings
+    - Modeli : FacebookApiResponses, LoginUserModel, RegisterUserModel, SearchMovieModel, AppSettings
     - Dohvaćanje podataka sa izvora :
         - www.facebook.com
         - www.themoviedb.org
@@ -36,4 +38,4 @@ Dosad napravljeno :
             - Dohvaćanje kolekcije korisnika
             - Dohvaćanje kolekcije facebook prijatelja od korisnika (preporuka?)
         - ExternalAuthController :
-            - Facebook Login uz koji ako korisnik ne postoji ga se stvara, ili ako postoji ga se po potrebi osvježava
+            - Facebook login uz koji ako korisnik ne postoji ga se stvara, ili ako postoji ga se po potrebi osvježava
