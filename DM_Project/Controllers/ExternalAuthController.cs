@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
@@ -79,7 +80,7 @@ namespace DM_Project.Controllers
                     LastName = userInfo.LastName,
                     Username = userInfo.Email,
                     Email = userInfo.Email,
-                    DateOfBirth = DateTime.Parse(userInfo.DateOfBirth),
+                    DateOfBirth = DateTime.Parse(userInfo.DateOfBirth, CultureInfo.InvariantCulture),
                     Image = userInfo.Picture.Data.Url,
                     FacebookId = userInfo.Id,
                     FacebookFriends = facebookFriends
