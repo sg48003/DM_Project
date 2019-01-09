@@ -24,6 +24,7 @@ namespace DM_Project.Controllers
         private readonly UserService _userService;
         private readonly AppSettings _appSettings;
         private readonly Imdb _imdb;
+        private readonly TrackService _trackService;
 
         public UsersController(MovieService movieService, UserService userService, IOptions<AppSettings> appSettings)
         {
@@ -127,7 +128,7 @@ namespace DM_Project.Controllers
 
         [Route("api/users/movies/collection")]
         [HttpDelete]
-        public ActionResult UpdateMovieCollection(string movieCollectionId)
+        public ActionResult DeleteFromMovieCollection(string movieCollectionId)
         {
             _userService.DeleteMovieFromCollection(movieCollectionId);
             return Ok();
@@ -147,6 +148,62 @@ namespace DM_Project.Controllers
 
             return movieRecommendations;
         }
+
+        [Route("api/users/tracks/add")]
+        [HttpPost]
+        public ActionResult AddTrackToCollection( Track track, string userId, string comment, decimal rating)
+        {
+         
+            
+            if (_trackService.Exists(track.Id.ToString()) == false)
+            {
+                _trackService.Create(track);
+            }
+
+            _userService.AddTrackToCollection(ObjectId.Parse(userId), track, comment, rating);
+
+            return CreatedAtAction("GetTrackCollection", new { id = track.Id }, track);
+        }
+
+
+        [Route("api/users/tracks/collection")]
+        [HttpGet]
+        public ActionResult<IEnumerable<TrackCollectionInfo>> GetTrackCollection(string userId)
+        {
+            return _userService.GetTrackCollection(ObjectId.Parse(userId));
+        }
+
+        [Route("api/users/tracks/collection")]
+        [HttpPost]
+        public ActionResult UpdateTrackCollection(List<TrackCollectionInfo> tracks)
+        {
+            _userService.UpdateTrackCollection(tracks);
+            return Ok();
+        }
+
+        [Route("api/users/tracks/collection")]
+        [HttpDelete]
+        public ActionResult DeleteFromTrackCollection(string trackCollectionId)
+        {
+            _userService.DeleteTrackFromCollection(trackCollectionId);
+            return Ok();
+        }
+
+        [Route("api/users/friends/tracks/collection")]
+        [HttpGet]
+        public ActionResult<IEnumerable<TrackCollectionInfo>> GetFriendsTrackCollection(string userId)
+        {
+            var tracksRecommendations = new List<TrackCollectionInfo>();
+
+            var user = _userService.GetById(ObjectId.Parse(userId));
+            foreach (var friend in user.FacebookFriends)
+            {
+                tracksRecommendations.AddRange(_userService.GetFacebookFriendsTrackCollection(friend.FacebookId));
+            }
+
+            return tracksRecommendations;
+        }
+
 
     }
 }

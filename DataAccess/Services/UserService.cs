@@ -12,16 +12,20 @@ namespace DataAccess.Services
     public class UserService
     {
         private readonly IMongoCollection<MovieCollection> _movieCollections;
+        private readonly IMongoCollection<TrackCollection> _trackCollections;
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<Movie> _movies;
+        private readonly IMongoCollection<Track> _tracks;
 
         public UserService()
         {
             var client = new MongoClient();
             var database = client.GetDatabase("DM_ProjectDB");
             _movieCollections = database.GetCollection<MovieCollection>("MovieCollections");
+            _trackCollections = database.GetCollection<TrackCollection>("TrackCollections");
             _users = database.GetCollection<User>("Users");
             _movies = database.GetCollection<Movie>("Movies");
+            _tracks = database.GetCollection<Track>("Tracks");
         }
 
         public User GetById(ObjectId id)
@@ -205,5 +209,76 @@ namespace DataAccess.Services
             return movieCollectionInfo;
         }
 
+        public List<TrackCollectionInfo> GetTrackCollection(ObjectId userId)
+        {
+            var trackCollectionInfo = new List<TrackCollectionInfo>();
+
+            List<TrackCollection> trackCollection = _trackCollections.Find(collection => collection.UserId == userId).ToList();
+            foreach (var item in trackCollection)
+            {
+                var track = _tracks.Find(x => x.Id == item.TrackId);
+                if (track != null)
+                {
+                    var newTrackInfo = new TrackCollectionInfo()
+                    {
+                        Track = (Track) track,
+                        TrackCollection = item
+                    };
+                    trackCollectionInfo.Add(newTrackInfo);
+                }
+            }
+
+            return trackCollectionInfo;
+        }
+
+        public TrackCollection AddTrackToCollection(ObjectId userId, Track track, string comment, decimal rating)
+        {
+            var trackCollection = new TrackCollection()
+            {
+                TrackId = track.Id,
+                UserId = userId,
+                Rating = rating,
+                Comment = comment
+            };
+            _trackCollections.InsertOne(trackCollection);
+            return trackCollection;
+        }
+
+        public void UpdateTrackCollection(List<TrackCollectionInfo> trackCollectionInfoIn)
+        {
+            foreach (var item in trackCollectionInfoIn)
+            {
+                _trackCollections.ReplaceOne(movie => movie.Id == item.TrackCollection.Id, item.TrackCollection);
+            }
+        }
+
+        public void DeleteTrackFromCollection(string trackCollectionId)
+        {
+            _trackCollections.DeleteOne(x => x.Id == ObjectId.Parse(trackCollectionId));
+        }
+
+
+        public List<TrackCollectionInfo> GetFacebookFriendsTrackCollection(long facebookId)
+        {
+            var trackCollectionInfo = new List<TrackCollectionInfo>();
+            var user = _users.Find(x => x.FacebookId == facebookId).SingleOrDefault();
+
+            List<TrackCollection> trackCollection = _trackCollections.Find(collection => collection.UserId == user.Id).ToList();
+            foreach (var item in trackCollection)
+            {
+                var track = _tracks.Find(x => x.Id == item.TrackId).SingleOrDefault();
+                if (track != null)
+                {
+                    var newTrackInfo = new TrackCollectionInfo()
+                    {
+                        Track = track,
+                        TrackCollection = item
+                    };
+                    trackCollectionInfo.Add(newTrackInfo);
+                }
+            }
+
+            return trackCollectionInfo;
+        }
     }
 }

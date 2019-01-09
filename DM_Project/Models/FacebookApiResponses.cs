@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace DM_Project.Models
 {
-    internal class FacebookUserData
+    internal class String
     {
         public long Id { get; set; }
         public string Email { get; set; }
