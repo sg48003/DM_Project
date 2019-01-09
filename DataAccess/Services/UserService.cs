@@ -135,6 +135,10 @@ namespace DataAccess.Services
 
         public MovieCollection AddMovieToCollection(ObjectId userId, ImdbMovie movieIn, string comment, decimal rating)
         {
+            if (_movieCollections.Find(x => x.UserId == userId && x.MovieId == movieIn.ImdbId).SingleOrDefault() != null)
+            {
+                throw new Exception("Movie already in collection");
+            }
             var movieCollection = new MovieCollection()
             {
                 MovieId = movieIn.ImdbId,
@@ -153,7 +157,7 @@ namespace DataAccess.Services
             List<MovieCollection> movieCollection = _movieCollections.Find(collection => collection.UserId == userId).ToList();
             foreach (var item in movieCollection)
             {
-                var movie = _movies.Find(x => x.Id == ObjectId.Parse(item.MovieId)).SingleOrDefault();
+                var movie = _movies.Find(x => x.ImdbId == item.MovieId).SingleOrDefault();
                 if (movie != null)
                 {
                     var newMovieInfo = new MovieCollectionInfo()
