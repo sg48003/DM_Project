@@ -106,9 +106,9 @@ namespace DM_Project.Controllers
                 _movieService.Create(movie);
             }
 
-            _userService.AddMovieToCollection(ObjectId.Parse(userId), movie, comment, rating);
+            var movieCollection = _userService.AddMovieToCollection(ObjectId.Parse(userId), movie, comment, rating);
 
-            return CreatedAtAction("GetMovieCollection", new { id = movie.ImdbId }, movie);
+            return CreatedAtAction("GetMovieCollection", new { id = movieCollection.Id }, movieCollection);
         }
 
         [Route("api/users/movies/collection")]

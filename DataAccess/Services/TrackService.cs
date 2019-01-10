@@ -23,15 +23,16 @@ namespace DataAccess.Services
                 Title = newTrack.Title,
                 Album = newTrack.Album,
                 Artist = newTrack.Artist,
+                FmId = newTrack.FmId
  
             };
             _tracks.InsertOne(track);
             return track;
         }
 
-        public bool Exists(string id)
+        public bool Exists(int id)
         {
-            return _tracks.Find(track => track.Id.ToString().Equals(id)).Any();
+            return _tracks.Find(track => track.FmId == id).Any();
         }
     }
 }

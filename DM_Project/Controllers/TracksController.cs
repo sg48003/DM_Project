@@ -48,6 +48,7 @@ namespace DM_Project.Controllers
         public ActionResult<IEnumerable<SearchTrackModel>> TopTracks()
         {
             var popularTracks = _client.Chart.GetTopTracksAsync(page:1,itemsPerPage:10).Result;
+            var id = _client.Track.GetInfoAsync("Umbrella", "Rihanna").Id;
             return popularTracks.Select(track => new SearchTrackModel()
             {
                 Title = track.Name,
