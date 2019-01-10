@@ -26,6 +26,7 @@ Dosad napravljeno :
         - www.omdbapi.com
         - www.last.fm.com
         - www.galiboo.com
+        - https://newsapi.org/
     - Lijepši prikaz svih mogućih API poziva preko Swagger-a sa mogućnosti autorizacije
     - Autorizacija preko JWT Bearer tokena
     - API ključevi za Imdb, TMDB i Facebook kao i ključ za kriptiranje i FacebookAppID su spremljeni u appsettings.json kao im 
@@ -46,5 +47,8 @@ Dosad napravljeno :
             - Pretraživanje pjesama po imenu
             - Dohvaćanje popularnih pjesama
             - Dohvaćanje sličnih pjesama ovisno o danoj pjesmi
+        - NewsController :
+            - Pretraživanje vijesti
+            - Dohvaćanje članaka vezanih za tu temu koju je korisnik upisao
         - ExternalAuthController :
             - Facebook login uz koji ako korisnik ne postoji ga se stvara, ili ako postoji ga se po potrebi osvježava
