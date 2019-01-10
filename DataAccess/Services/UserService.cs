@@ -6,7 +6,6 @@ using DataAccess.Models;
 using IMDBCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using IF.Lastfm.Core.Api;
 
 namespace DataAccess.Services
 {
