@@ -6,6 +6,7 @@ using DataAccess.Models;
 using IMDBCore;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using IF.Lastfm.Core.Api;
 
 namespace DataAccess.Services
 {
@@ -220,7 +221,7 @@ namespace DataAccess.Services
             List<TrackCollection> trackCollection = _trackCollections.Find(collection => collection.UserId == userId).ToList();
             foreach (var item in trackCollection)
             {
-                var track = _tracks.Find(x => x.Id == item.TrackId);
+                var track = _tracks.Find(x => x.Id == item.Id);
                 if (track != null)
                 {
                     var newTrackInfo = new TrackCollectionInfo()
@@ -237,9 +238,13 @@ namespace DataAccess.Services
 
         public TrackCollection AddTrackToCollection(ObjectId userId, Track track, string comment, decimal rating)
         {
+            if (_trackCollections.Find(x => x.UserId == userId && x.FmId == track.FmId).SingleOrDefault() != null)
+            {
+                throw new Exception("Track is already in collection");
+            }
             var trackCollection = new TrackCollection()
             {
-                TrackId = track.Id,
+                FmId = track.FmId,
                 UserId = userId,
                 Rating = rating,
                 Comment = comment
@@ -252,7 +257,7 @@ namespace DataAccess.Services
         {
             foreach (var item in trackCollectionInfoIn)
             {
-                _trackCollections.ReplaceOne(movie => movie.Id == item.TrackCollection.Id, item.TrackCollection);
+                _trackCollections.ReplaceOne(track => track.Id == item.TrackCollection.Id, item.TrackCollection);
             }
         }
 
@@ -270,7 +275,7 @@ namespace DataAccess.Services
             List<TrackCollection> trackCollection = _trackCollections.Find(collection => collection.UserId == user.Id).ToList();
             foreach (var item in trackCollection)
             {
-                var track = _tracks.Find(x => x.Id == item.TrackId).SingleOrDefault();
+                var track = _tracks.Find(x => x.Id == item.Id).SingleOrDefault();
                 if (track != null)
                 {
                     var newTrackInfo = new TrackCollectionInfo()

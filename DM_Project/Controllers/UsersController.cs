@@ -7,6 +7,8 @@ using DataAccess.Models;
 using DataAccess.Services;
 using DM_Project.Helpers;
 using DM_Project.Models;
+using IF.Lastfm.Core.Api;
+using IF.Lastfm.Core.Objects;
 using IMDBCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,13 +27,16 @@ namespace DM_Project.Controllers
         private readonly AppSettings _appSettings;
         private readonly Imdb _imdb;
         private readonly TrackService _trackService;
+        private readonly LastfmClient _musicClient;
 
-        public UsersController(MovieService movieService, UserService userService, IOptions<AppSettings> appSettings)
+        public UsersController(MovieService movieService, UserService userService, TrackService trackService, IOptions<AppSettings> appSettings)
         {
             _movieService = movieService;
             _userService = userService;
+            _trackService = trackService;
             _appSettings = appSettings.Value;
             _imdb = new Imdb(appSettings.Value.ImdbApiKey);
+            _musicClient = new LastfmClient(appSettings.Value.LastfmApiKey, appSettings.Value.LastfmApiSecret);
         }
 
         [AllowAnonymous]
@@ -151,18 +156,25 @@ namespace DM_Project.Controllers
 
         [Route("api/users/tracks/add")]
         [HttpPost]
-        public ActionResult AddTrackToCollection( Track track, string userId, string comment, decimal rating)
+        public async System.Threading.Tasks.Task<ActionResult> AddTrackToCollectionAsync( string trackName, string artistName, string userId, string comment, decimal rating)
         {
-         
-            
-            if (_trackService.Exists(track.Id.ToString()) == false)
+
+            var response = await _musicClient.Track.GetInfoAsync(trackName, artistName);
+            Track newTrack = new Track();
+            newTrack.Title = response.Content.Name;
+            newTrack.FmId = response.Content.Id;
+            newTrack.Album = response.Content.AlbumName;
+            newTrack.Artist = response.Content.ArtistName;
+
+
+            if (_trackService.Exists(newTrack.FmId) == false)
             {
-                _trackService.Create(track);
+                _trackService.Create(newTrack);
             }
 
-            _userService.AddTrackToCollection(ObjectId.Parse(userId), track, comment, rating);
+            _userService.AddTrackToCollection(ObjectId.Parse(userId), newTrack, comment, rating);
 
-            return CreatedAtAction("GetTrackCollection", new { id = track.Id }, track);
+            return CreatedAtAction("GetTrackCollection", new { id = newTrack.Id }, newTrack);
         }
 
 

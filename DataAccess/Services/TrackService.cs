@@ -30,7 +30,7 @@ namespace DataAccess.Services
             return track;
         }
 
-        public bool Exists(int id)
+        public bool Exists(string id)
         {
             return _tracks.Find(track => track.FmId == id).Any();
         }
