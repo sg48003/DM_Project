@@ -1,10 +1,11 @@
 # DM_Project
 Dosad napravljeno :
 - MongoDB baza podataka :
-    - Modeli : Movie, MovieCollection, User, FacebookFriend, MovieCollectionInfo
+    - Modeli : Movie, MovieCollection, User, FacebookFriend, MovieCollectionInfo, Track, TrackCollection, TrackCollectionInfo
     - Kriptografija lozinke korisnika
     - Spremanje filma u bazu podataka 
-    - Provjeravanja da li postoji film s proslijeđenim ImdbId-jem
+    - Provjeravanja da li postoji film s proslijeđenim ImdbId-jem  
+    - Spremanje pjesme u bazu podataka
     - Dohvaćanje korisnika po parametru id ili email
     - Registracija i autentifikacija ("običnog")korisnika
     - Registracija facebook korisnika
@@ -14,6 +15,8 @@ Dosad napravljeno :
     - Brisanje pojednog filma iz kolekcije proslijeđujući MovieCollectionId
     - Osvježavanje kolekcije pojedinog korisnika
     - Dohvaćanje kolekcije pojedinog korisnika ili dohvaćanje kolekcije facebook prijatelja pojedinog korisnika s podacima o filmovima
+    - Dodavanje pjesme u kolekciju pjesama uz komentar i ocjenu korisnika
+    - Dohvaćanje kolekcije pjesama korisnika i dohvaćanje kolekcije  facebook prijatelja
     
 - Web API (.NET Core 2.2) :
     - Modeli : FacebookApiResponses, LoginUserModel, RegisterUserModel, SearchMovieModel, AppSettings
@@ -21,6 +24,8 @@ Dosad napravljeno :
         - www.facebook.com
         - www.themoviedb.org
         - www.omdbapi.com
+        - www.last.fm.com
+        - www.galiboo.com
     - Lijepši prikaz svih mogućih API poziva preko Swagger-a sa mogućnosti autorizacije
     - Autorizacija preko JWT Bearer tokena
     - API ključevi za Imdb, TMDB i Facebook kao i ključ za kriptiranje i FacebookAppID su spremljeni u appsettings.json kao im 
@@ -37,5 +42,9 @@ Dosad napravljeno :
             - Dodavanje filma u kolekciju korisnika
             - Dohvaćanje kolekcije korisnika
             - Dohvaćanje kolekcije facebook prijatelja od korisnika (preporuka?)
+        - TrackController :
+            - Pretraživanje pjesama po imenu
+            - Dohvaćanje popularnih pjesama
+            - Dohvaćanje sličnih pjesama ovisno o danoj pjesmi
         - ExternalAuthController :
             - Facebook login uz koji ako korisnik ne postoji ga se stvara, ili ako postoji ga se po potrebi osvježava
