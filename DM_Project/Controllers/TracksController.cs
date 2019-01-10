@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using DM_Project.Helpers;
 using DM_Project.Models;
 using IF.Lastfm.Core.Api;
-using IMDBCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using TMDbLib.Client;
-using TMDbLib.Objects.General;
-using SearchMovie = TMDbLib.Objects.Search.SearchMovie;
+
 
 
 namespace DM_Project.Controllers
@@ -19,12 +17,12 @@ namespace DM_Project.Controllers
     public class TracksController : ControllerBase
     {   
         private readonly LastfmClient _client;
-        private IOptions<AppSettings> _appSettings;
+        private readonly string GalibooKey; 
 
         public TracksController(IOptions<AppSettings> appSettings)
         {
             _client = new LastfmClient(appSettings.Value.LastfmApiKey, appSettings.Value.LastfmApiSecret);
-            _appSettings = appSettings;
+            GalibooKey = appSettings.Value.GalibooApiKey;
         }
 
         [Route("api/track/search")]
@@ -90,12 +88,44 @@ namespace DM_Project.Controllers
         [Route("api/tracks/emotions")]
         [HttpGet]
 
-        public ActionResult<IEnumerable<SearchTrack>> Emotions(string emotion)
+        public async System.Threading.Tasks.Task<ActionResult<IEnumerable<SearchTrack>>> EmotionsAsync(string emotion)
         {
  
-            string url = "https://secure.galiboo.com/api/discover/tracks/smart_search/?token=" + _appSettings.Value.GalibooApiKey + "&q=" + emotion;
+            string url = "https://secure.galiboo.com/api/discover/tracks/smart_search/?token=" + GalibooKey + "&q=" + emotion;
             string[] array = new string[50];
-            string jsonString = JsonConvert.DeserializeObject<string>(url);
+            string jsonString;
+            using (var httpClient = new HttpClient())
+            {
+                jsonString = await httpClient.GetStringAsync(url);
+
+                // Now parse with JSON.Net
+            }
+            RootObject json = JsonConvert.DeserializeObject<RootObject>(jsonString);
+            List<SearchTrack> list = new List<SearchTrack>();
+            foreach (var element in json.results)
+            {
+                SearchTrack track = new SearchTrack();
+                track.Title = element.title;
+                string artist = "";
+                foreach(var artistEl in element.artists)
+                {
+
+                    artist = artistEl.name;
+                    if(element.artists.Count == 1)
+                    {
+                        break;
+                    }  else
+                    {
+                        artist = artist + ", ";
+                    }
+
+                }
+                track.Artist = artist;
+                list.Add(track);
+            }
+
+            return list;
+            /*
             string withoutLeftBrac = jsonString.Replace(@"{", string.Empty);
             string withoutRightBrac = withoutLeftBrac.Replace(@"}", string.Empty);
             string withoutComas = withoutRightBrac.Replace(@",", string.Empty);
@@ -133,16 +163,16 @@ namespace DM_Project.Controllers
                 list.Add(track);
             }
 
-            return list;
+            return list;*/
 
 
         }
 
-        public  int[] FindAllIndexOf<T>(this T[] array, Predicate<T> match)
+       /* public  int[] FindAllIndexOf<T>(T[] array, Predicate<T> match)
         {
             return array.Select((value, index) => match(value) ? index : -1)
                     .Where(index => index != -1).ToArray();
-        }
+        }*/
     }
 
     
