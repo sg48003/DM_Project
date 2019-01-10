@@ -10,6 +10,7 @@
         public string LastfmApiKey { get; set; }
         public string LastfmApiSecret { get; set; }
         public string GalibooApiKey { get; set; }
+        public string NewsApiKey { get; set; }
 
     }
 }

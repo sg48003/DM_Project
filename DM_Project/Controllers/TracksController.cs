@@ -125,54 +125,11 @@ namespace DM_Project.Controllers
             }
 
             return list;
-            /*
-            string withoutLeftBrac = jsonString.Replace(@"{", string.Empty);
-            string withoutRightBrac = withoutLeftBrac.Replace(@"}", string.Empty);
-            string withoutComas = withoutRightBrac.Replace(@",", string.Empty);
-            string withoutLeft = withoutComas.Replace(@"[", string.Empty);
-            string withoutRight = withoutLeft.Replace(@"]", string.Empty);
-            array = withoutRight.Split(":");
-            int[] titles = new int[100];
-            int counter = 0;
-            int[] autors = new int[100];
-            int counter2 = 0;
-            for (int i = 0; i < array.Length;i++)
-            {
-                if (array.ElementAt(i).Equals("title"))
-                {
-                    titles[counter] = i + 1;
-                    counter++;
-                }
-
-                if (array.ElementAt(i).Equals("name"))
-                {
-                    autors[counter2] = i + 1;
-                    counter++;
-                }
-
-            }
-            List<SearchTrack> list = new List<SearchTrack>();
-            for(int j = 0; j < counter; j++)
-            {
-                SearchTrack track = new SearchTrack()
-                {
-                    Title = array.ElementAt(titles[j]),
-                    Artist = array.ElementAt(autors[j])
-                };
-
-                list.Add(track);
-            }
-
-            return list;*/
 
 
         }
 
-       /* public  int[] FindAllIndexOf<T>(T[] array, Predicate<T> match)
-        {
-            return array.Select((value, index) => match(value) ? index : -1)
-                    .Where(index => index != -1).ToArray();
-        }*/
+ 
     }
 
     
