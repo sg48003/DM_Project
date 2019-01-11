@@ -220,12 +220,12 @@ namespace DataAccess.Services
             List<TrackCollection> trackCollection = _trackCollections.Find(collection => collection.UserId == userId).ToList();
             foreach (var item in trackCollection)
             {
-                var track = _tracks.Find(x => x.Id == item.Id);
+                var track = _tracks.Find(x => x.FmId == item.FmId).SingleOrDefault();
                 if (track != null)
                 {
                     var newTrackInfo = new TrackCollectionInfo()
                     {
-                        Track = (Track) track,
+                        Track = track,
                         TrackCollection = item
                     };
                     trackCollectionInfo.Add(newTrackInfo);

@@ -162,7 +162,7 @@ namespace DM_Project.Controllers
             var response = await _musicClient.Track.GetInfoAsync(trackName, artistName);
             Track newTrack = new Track();
             newTrack.Title = response.Content.Name;
-            newTrack.FmId = response.Content.Id;
+            newTrack.FmId = response.Content.Url.ToString();
             newTrack.Album = response.Content.AlbumName;
             newTrack.Artist = response.Content.ArtistName;
 
@@ -172,9 +172,9 @@ namespace DM_Project.Controllers
                 _trackService.Create(newTrack);
             }
 
-            _userService.AddTrackToCollection(ObjectId.Parse(userId), newTrack, comment, rating);
+           var newTrackCollection = _userService.AddTrackToCollection(ObjectId.Parse(userId), newTrack, comment, rating);
 
-            return CreatedAtAction("GetTrackCollection", new { id = newTrack.Id }, newTrack);
+            return CreatedAtAction("GetTrackCollection", new { id = newTrack.Id }, newTrackCollection);
         }
 
 
