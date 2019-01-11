@@ -7,5 +7,10 @@
         public string TmdbApiKey { get; set; }
         public string FacebookAppId { get; set; }
         public string FacebookAppSecret { get; set; }
+        public string LastfmApiKey { get; set; }
+        public string LastfmApiSecret { get; set; }
+        public string GalibooApiKey { get; set; }
+        public string NewsApiKey { get; set; }
+
     }
 }

@@ -7,6 +7,8 @@ using DataAccess.Models;
 using DataAccess.Services;
 using DM_Project.Helpers;
 using DM_Project.Models;
+using IF.Lastfm.Core.Api;
+using IF.Lastfm.Core.Objects;
 using IMDBCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,13 +26,17 @@ namespace DM_Project.Controllers
         private readonly UserService _userService;
         private readonly AppSettings _appSettings;
         private readonly Imdb _imdb;
+        private readonly TrackService _trackService;
+        private readonly LastfmClient _musicClient;
 
-        public UsersController(MovieService movieService, UserService userService, IOptions<AppSettings> appSettings)
+        public UsersController(MovieService movieService, UserService userService, TrackService trackService, IOptions<AppSettings> appSettings)
         {
             _movieService = movieService;
             _userService = userService;
+            _trackService = trackService;
             _appSettings = appSettings.Value;
             _imdb = new Imdb(appSettings.Value.ImdbApiKey);
+            _musicClient = new LastfmClient(appSettings.Value.LastfmApiKey, appSettings.Value.LastfmApiSecret);
         }
 
         [AllowAnonymous]
@@ -127,7 +133,7 @@ namespace DM_Project.Controllers
 
         [Route("api/users/movies/collection")]
         [HttpDelete]
-        public ActionResult UpdateMovieCollection(string movieCollectionId)
+        public ActionResult DeleteFromMovieCollection(string movieCollectionId)
         {
             _userService.DeleteMovieFromCollection(movieCollectionId);
             return Ok();
@@ -147,6 +153,69 @@ namespace DM_Project.Controllers
 
             return movieRecommendations;
         }
+
+        [Route("api/users/tracks/add")]
+        [HttpPost]
+        public async System.Threading.Tasks.Task<ActionResult> AddTrackToCollectionAsync( string trackName, string artistName, string userId, string comment, decimal rating)
+        {
+
+            var response = await _musicClient.Track.GetInfoAsync(trackName, artistName);
+            Track newTrack = new Track();
+            newTrack.Title = response.Content.Name;
+            newTrack.FmId = response.Content.Url.ToString();
+            newTrack.Album = response.Content.AlbumName;
+            newTrack.Artist = response.Content.ArtistName;
+
+
+            if (_trackService.Exists(newTrack.FmId) == false)
+            {
+                _trackService.Create(newTrack);
+            }
+
+           var newTrackCollection = _userService.AddTrackToCollection(ObjectId.Parse(userId), newTrack, comment, rating);
+
+            return CreatedAtAction("GetTrackCollection", new { id = newTrack.Id }, newTrackCollection);
+        }
+
+
+        [Route("api/users/tracks/collection")]
+        [HttpGet]
+        public ActionResult<IEnumerable<TrackCollectionInfo>> GetTrackCollection(string userId)
+        {
+            return _userService.GetTrackCollection(ObjectId.Parse(userId));
+        }
+
+        [Route("api/users/tracks/collection")]
+        [HttpPost]
+        public ActionResult UpdateTrackCollection(List<TrackCollectionInfo> tracks)
+        {
+            _userService.UpdateTrackCollection(tracks);
+            return Ok();
+        }
+
+        [Route("api/users/tracks/collection")]
+        [HttpDelete]
+        public ActionResult DeleteFromTrackCollection(string trackCollectionId)
+        {
+            _userService.DeleteTrackFromCollection(trackCollectionId);
+            return Ok();
+        }
+
+        [Route("api/users/friends/tracks/collection")]
+        [HttpGet]
+        public ActionResult<IEnumerable<TrackCollectionInfo>> GetFriendsTrackCollection(string userId)
+        {
+            var tracksRecommendations = new List<TrackCollectionInfo>();
+
+            var user = _userService.GetById(ObjectId.Parse(userId));
+            foreach (var friend in user.FacebookFriends)
+            {
+                tracksRecommendations.AddRange(_userService.GetFacebookFriendsTrackCollection(friend.FacebookId));
+            }
+
+            return tracksRecommendations;
+        }
+
 
     }
 }
