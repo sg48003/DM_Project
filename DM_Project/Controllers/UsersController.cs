@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using DataAccess.Models;
@@ -152,6 +153,22 @@ namespace DM_Project.Controllers
             }
 
             return movieRecommendations;
+        }
+
+        [Route("api/users/friends/movies/recommendations")]
+        [HttpGet]
+        public ActionResult<IEnumerable<MovieCollectionInfo>> GetFriendsMovieRecommendations(string userId)
+        {
+            var movieRecommendations = new List<MovieCollectionInfo>();
+
+            var user = _userService.GetById(ObjectId.Parse(userId));
+            var userCollection = _userService.GetMovieCollection(ObjectId.Parse(userId));
+            foreach (var friend in user.FacebookFriends)
+            {
+                movieRecommendations.AddRange(_userService.GetFacebookFriendsMovieCollection(friend.FacebookId));
+            }
+
+            return movieRecommendations.Except(userCollection).ToList();
         }
 
         [Route("api/users/tracks/add")]
