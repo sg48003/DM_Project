@@ -35,7 +35,7 @@ namespace DM_Project.Controllers
         {
             //korisnik mora biti tester da bi radilo, to se može postaviti na https://developers.facebook.com/ 
             //dodati povratnu vezu URL na stranicu https://developers.facebook.com/
-            //treba ranije pozvati https://www.facebook.com/v2.11/dialog/oauth?&response_type=token&display=popup&client_id={_appSettings.FacebookAppId}&display=popup&redirect_uri={URL_ZA_POVRATNU_VEZU}&scope=email,user_birthday,user_friends,user_likes
+            //treba ranije pozvati https://www.facebook.com/v2.11/dialog/oauth?&response_type=token&display=popup&client_id={_appSettings.FacebookAppId}&display=popup&redirect_uri={URL_ZA_POVRATNU_VEZU}&scope=email,user_birthday,user_friends
             //proslijediti ovoj metodi access token koji se dobije pozivanjem gornjeg url-a
 
             // 1.generate an app access token
