@@ -194,7 +194,7 @@ namespace DataAccess.Services
             List<MovieCollection> movieCollection = _movieCollections.Find(collection => collection.UserId == user.Id).ToList();
             foreach (var item in movieCollection)
             {
-                var movie = _movies.Find(x => x.Id == ObjectId.Parse(item.MovieId)).SingleOrDefault();
+                var movie = _movies.Find(x => x.ImdbId == item.MovieId).SingleOrDefault();
                 if (movie != null)
                 {
                     var newMovieInfo = new MovieCollectionInfo()
