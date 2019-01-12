@@ -30,6 +30,7 @@ namespace DM_Project
         {
             services.AddScoped<MovieService>();
             services.AddScoped<UserService>();
+            services.AddScoped<TrackService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSwaggerGen(c =>

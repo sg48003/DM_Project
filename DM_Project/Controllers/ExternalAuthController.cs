@@ -85,7 +85,7 @@ namespace DM_Project.Controllers
                     FacebookId = userInfo.Id,
                     FacebookFriends = facebookFriends
                 };
-               
+
                 _userService.RegisterFacebook(userIn);
                 user = userIn;
             }
@@ -112,7 +112,7 @@ namespace DM_Project.Controllers
                 if (updateFlag)
                 {
                     _userService.UpdateFacebookUser(user.Id, user);
-                }                
+                }
             }
 
             //var jwt = await Tokens.GenerateJwt(_jwtFactory.GenerateClaimsIdentity(localUser.Username, localUser.Id.ToString()),
